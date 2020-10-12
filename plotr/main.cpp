@@ -16,32 +16,7 @@ int main()
 	tri.setFillColor(sf::Color::Black);
 	pixel.setFillColor(sf::Color::Black);
 
-	// Drawing coordinate system
-	for (int x = 0; x < window.getSize().x; x+=2)
-	{
-		pixel.setPosition(sf::Vector2f(x, y_size/2));
-		window.draw(pixel);
-		if (x == (window.getSize().x - 2))
-		{
-			tri.setRotation(90);
-			tri.setPosition(sf::Vector2f(x,pixel.getPosition().y-7));
-			window.draw(tri);
-		}
-		window.display();
-	}
-
-	for (int y = 0; y < window.getSize().y; y+=2)
-	{
-		pixel.setPosition(sf::Vector2f(x_size/2, y));
-		window.draw(pixel);
-		if (y == 0)
-		{
-			tri.setRotation(0);
-			tri.setPosition(sf::Vector2f(pixel.getPosition().x-7, y));
-			window.draw(tri);
-		}
-		window.display();
-	}
+	
 
 	// Draws the entire grid, useful later..
 	/*for (int x = 0; x < window.getSize().x; x+=2)
@@ -68,12 +43,37 @@ int main()
 		sf::Event event;
 		while (window.pollEvent(event)) 
 		{
-
 			if (event.type == sf::Event::Closed)
 				window.close();
 			else if (event.type == sf::Event::Resized)
 				window.setSize(sf::Vector2u(event.size.width, event.size.height));
 		}
+		window.clear(sf::Color(237,237,237));
+		// Drawing coordinate system
+		for (int x = 0; x < window.getSize().x; x += 2)
+		{
+			pixel.setPosition(sf::Vector2f(x, y_size / 2));
+			window.draw(pixel);
+			if (x == (window.getSize().x - 2))
+			{
+				tri.setRotation(90);
+				tri.setPosition(sf::Vector2f(x, pixel.getPosition().y - 7));
+				window.draw(tri);
+			}
+		}
+
+		for (int y = 0; y < window.getSize().y; y += 2)
+		{
+			pixel.setPosition(sf::Vector2f(x_size / 2, y));
+			window.draw(pixel);
+			if (y == 0)
+			{
+				tri.setRotation(0);
+				tri.setPosition(sf::Vector2f(pixel.getPosition().x - 7, y));
+				window.draw(tri);
+			}
+		}
+
 		window.display();
 	}
 
