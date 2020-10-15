@@ -6,8 +6,10 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1920, 1020), "plotr", sf::Style::Default);
 	window.setPosition(sf::Vector2i(0,0));
-	window.clear(sf::Color(237,237,237));
+
+	// Declaring important variables
 	int x_size = window.getSize().x, y_size = window.getSize().y; // Defining size of the window, customizable
+	int zoom_factor = 160; // This one changes whenever user zooms in / out
 
 	// Creating the circle to indicate which point we are at
 	sf::CircleShape pt(3.f);
@@ -51,6 +53,21 @@ int main()
 				window.close();
 			else if (event.type == sf::Event::Resized)
 				window.setSize(sf::Vector2u(event.size.width, event.size.height));
+			else if (event.type == sf::Event::MouseWheelScrolled)
+			{
+				// Deciding whether user wants to zoom in or out
+				// Fix with a stack
+				if (event.mouseWheelScroll.delta > 0) // zoom in
+					zoom_factor *= 0.75;
+				/* Explanation: This is a zoom in because what we effectively do is only make the distance between
+				the points smaller so we can fit more points in the screen. As our zoom factor is only used in
+				calculating the distance between points, we can make it smaller by multiplying it with 0.75,
+				which seems counter-intuitive but works!! Exactly because we have to fit more points, i.e to get
+				more accurate numbers. Zooming out would mean getting less accurate, but more numbers, which is
+				why distances get bigger. Also, a stack is used to guarantee that the zooming works properly.*/
+				else // zoom out
+					zoom_factor *= 1.25;
+			}
 		}
 
 		window.clear(sf::Color(237,237,237)); // Clearing window with grey color
@@ -60,7 +77,7 @@ int main()
 		{
 			pixel.setPosition(sf::Vector2f(x, (y_size-60) / 2));
 			window.draw(pixel);
-			if (x % 160 == 0)
+			if (x % zoom_factor == 0)
 			{
 				pt.setPosition(pixel.getPosition());
 				window.draw(pt);
@@ -77,7 +94,7 @@ int main()
 		{
 			pixel.setPosition(sf::Vector2f(x_size / 2, y));
 			window.draw(pixel);
-			if (y % 160 == 0)
+			if (y % zoom_factor == 0)
 			{
 				pt.setPosition(pixel.getPosition());
 				window.draw(pt);
