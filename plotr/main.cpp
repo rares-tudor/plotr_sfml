@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include <queue>
 
 int main()
 {
@@ -9,7 +10,7 @@ int main()
 
 	// Declaring important variables
 	int x_size = window.getSize().x, y_size = window.getSize().y; // Defining size of the window, customizable
-	int zoom_factor = 160; // This one changes whenever user zooms in / out
+	float zoom_factor = 1.0f; // This one changes whenever user zooms in / out
 
 	// Creating the circle to indicate which point we are at
 	sf::CircleShape pt(3.f);
@@ -21,8 +22,6 @@ int main()
 	tri.setPointCount(3);
 	tri.setFillColor(sf::Color::Black);
 	pixel.setFillColor(sf::Color::Black);
-
-	
 
 	// Draws the entire grid, useful later..
 	/*for (int x = 0; x < window.getSize().x; x+=2)
@@ -55,10 +54,11 @@ int main()
 				window.setSize(sf::Vector2u(event.size.width, event.size.height));
 			else if (event.type == sf::Event::MouseWheelScrolled)
 			{
+				
 				// Deciding whether user wants to zoom in or out
 				// Fix with a stack
 				if (event.mouseWheelScroll.delta > 0) // zoom in
-					zoom_factor *= 0.75;
+					zoom_factor -= 0.25f;
 				/* Explanation: This is a zoom in because what we effectively do is only make the distance between
 				the points smaller so we can fit more points in the screen. As our zoom factor is only used in
 				calculating the distance between points, we can make it smaller by multiplying it with 0.75,
@@ -66,7 +66,7 @@ int main()
 				more accurate numbers. Zooming out would mean getting less accurate, but more numbers, which is
 				why distances get bigger. Also, a stack is used to guarantee that the zooming works properly.*/
 				else // zoom out
-					zoom_factor *= 1.25;
+					zoom_factor += 0.25f;
 			}
 		}
 
@@ -77,7 +77,7 @@ int main()
 		{
 			pixel.setPosition(sf::Vector2f(x, (y_size-60) / 2));
 			window.draw(pixel);
-			if (x % zoom_factor == 0)
+			if (x % (int)(160 * zoom_factor) == 0)
 			{
 				pt.setPosition(pixel.getPosition());
 				window.draw(pt);
@@ -94,7 +94,7 @@ int main()
 		{
 			pixel.setPosition(sf::Vector2f(x_size / 2, y));
 			window.draw(pixel);
-			if (y % zoom_factor == 0)
+			if (y % (int)(160 * zoom_factor) == 0)
 			{
 				pt.setPosition(pixel.getPosition());
 				window.draw(pt);
