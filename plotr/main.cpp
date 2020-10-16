@@ -42,7 +42,11 @@ int main()
 			window.display();
 		}
 	}*/
-
+	sf::VertexArray vertex(sf::Lines, 2);
+	vertex[0].position = sf::Vector2f(0.f,0.f);
+	vertex[1].position = sf::Vector2f(1920.f, 960.f);
+	vertex[0].color = sf::Color::Red;
+	vertex[1].color = sf::Color::Red;
 	while (window.isOpen()) 
 	{
 		sf::Event event;
@@ -106,7 +110,7 @@ int main()
 				window.draw(tri);
 			}
 		}
-
+		window.draw(vertex);
 		window.display();
 	}
 
