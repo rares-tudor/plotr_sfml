@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <string>
+#include <math.h>
 
 int main()
 {
@@ -11,42 +13,31 @@ int main()
 	// Declaring important variables
 	int x_size = window.getSize().x, y_size = window.getSize().y; // Defining size of the window, customizable
 	float zoom_factor = 1.0f; // This one changes whenever user zooms in / out
+	float raw_x, raw_y; // These will be used for the plotting of the functions themselves
+
+	// Function variables (form: f(x) = ax(^n) + bx(^n-1) ... + cx^0
+	// testing purposes, later this will be input by the user
+	float a = -1, b = 0, n = 2, c = 0.19; // FIX THIS BS ITS BARELY FUCKING WORKING
 
 	// Creating the circle to indicate which point we are at
 	sf::CircleShape pt(3.f);
 	pt.setFillColor(sf::Color::Red);
-
-	// Creating the pixel which will create the grid, drawing it iteratively on the canvas
-	sf::RectangleShape pixel(sf::Vector2f(2.f, 2.f));
+	// Aesthetic purposes, just the triangle at the extremities of our coord. system
 	sf::CircleShape tri(8.f);
 	tri.setPointCount(3);
 	tri.setFillColor(sf::Color::Black);
+
+	// Creating the pixel which will create the coordinate system 
+	sf::RectangleShape pixel(sf::Vector2f(2.f, 2.f));
 	pixel.setFillColor(sf::Color::Black);
 
-	// Draws the entire grid, useful later..
-	/*for (int x = 0; x < window.getSize().x; x+=2)
-	{
-		for (int y = 0; y < window.getSize().y; y+=2)
-		{
-			pixel.setFillColor(sf::Color::White);
-			if (y == (window.getSize().y / 2) || x == (window.getSize().x / 2))
-			{
-				pixel.setFillColor(sf::Color::Black);
-				pixel.setPosition(sf::Vector2f(x,y));
-				window.draw(pixel);
-				window.display();
-				continue;
-			}
-			pixel.setPosition(sf::Vector2f(x, y));
-			window.draw(pixel);
-			window.display();
-		}
-	}*/
-	sf::VertexArray vertex(sf::Lines, 2);
-	vertex[0].position = sf::Vector2f(0.f,0.f);
-	vertex[1].position = sf::Vector2f(1920.f, 960.f);
-	vertex[0].color = sf::Color::Red;
-	vertex[1].color = sf::Color::Red;
+
+	// This point is used for drawing the function
+	sf::RectangleShape f_pixel(sf::Vector2f(4.f, 4.f));
+	f_pixel.setFillColor(sf::Color::Red);
+
+	
+
 	while (window.isOpen()) 
 	{
 		sf::Event event;
@@ -76,22 +67,23 @@ int main()
 
 		window.clear(sf::Color(237,237,237)); // Clearing window with grey color
 
-		// Drawing coordinate system
+		// Drawing coordinate system, first x-axis (here) then y-axis (line 89)
 		for (int x = 0; x < window.getSize().x; x += 2)
 		{
 			pixel.setPosition(sf::Vector2f(x, (y_size-60) / 2));
 			window.draw(pixel);
 			if (x % (int)(160 * zoom_factor) == 0)
 			{
-				pt.setPosition(pixel.getPosition());
+				pt.setPosition(pixel.getPosition()); // 1 length unit = 160 pixels
 				window.draw(pt);
 			}
 			if (x == (window.getSize().x - 2))
 			{
-				tri.setRotation(90);
+				tri.setRotation(90); // These are the arrows
 				tri.setPosition(sf::Vector2f(x, pixel.getPosition().y - 7));
 				window.draw(tri);
 			}
+
 		}
 
 		for (int y = 0; y <= window.getSize().y-60; y += 2)
@@ -110,7 +102,29 @@ int main()
 				window.draw(tri);
 			}
 		}
-		window.draw(vertex);
+		
+		if (a != 0) // We only draw if our function isn't equal to one of the axes
+		{
+			for (int x = 0; x < window.getSize().x; ++x)
+			{
+				if (x < window.getSize().x / 2) raw_x = -6.f + (x / 160.f);	// this has to be improved eventually, rn it just takes the -6 to 6 scale of our coord. system
+				else raw_x = 6.f - (x / 160.f);								// but what this does is it gives us raw coordinates like we'd observe on a normal coord. system
+
+				if (raw_x == 0) // maybe this can be written in a better fashion. just checks for when the axes meet
+				{
+					raw_y = window.getSize().y / 2;
+					pixel.setPosition(sf::Vector2f(x,raw_y));
+					window.draw(f_pixel);
+					continue;
+				}
+				else raw_y = a * pow(raw_x,n) +  b*pow(raw_x,n-1) + c; // raw_y is equivalent to f(x) (obviously)
+
+				// The formula is simple: 1 LU = 160 px, so we just multiply the raw value again. Additionally, if it's positive we draw it above the x-axis, if not below.
+				if (raw_y >= 0) f_pixel.setPosition(sf::Vector2f(x, ((window.getSize().y / 2) - 60) + 160 * abs(raw_y)));
+				else f_pixel.setPosition(sf::Vector2f(x,((window.getSize().y / 2) - 60) - 160 * abs(raw_y)));
+				window.draw(f_pixel);
+			}
+		}
 		window.display();
 	}
 
