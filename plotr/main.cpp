@@ -17,7 +17,7 @@ int main()
 
 	// Function variables (form: f(x) = ax(^n) + bx(^n-1) ... + cx^0
 	// testing purposes, later this will be input by the user
-	float a = -1, b = 0, n = 2, c = 0.19; // FIX THIS BS ITS BARELY FUCKING WORKING
+	float a = 4, b = 3, n = 5, c = 2;
 
 	// Creating the circle to indicate which point we are at
 	sf::CircleShape pt(3.f);
@@ -105,23 +105,13 @@ int main()
 		
 		if (a != 0) // We only draw if our function isn't equal to one of the axes
 		{
-			for (int x = 0; x < window.getSize().x; ++x)
+			for (float x = 0; x < window.getSize().x; x+=0.05f)
 			{
-				if (x < window.getSize().x / 2) raw_x = -6.f + (x / 160.f);	// this has to be improved eventually, rn it just takes the -6 to 6 scale of our coord. system
-				else raw_x = 6.f - (x / 160.f);								// but what this does is it gives us raw coordinates like we'd observe on a normal coord. system
+				raw_x = -6.f + (x / 160.f);
+				raw_y = a * pow(raw_x,n) + b*pow(raw_x,n-1) + c;
+				if (raw_y > 0) f_pixel.setPosition(x, (3 - raw_y) * 160.f);
+				else f_pixel.setPosition(x, 960 - (3 + raw_y) * 160.f);
 
-				if (raw_x == 0) // maybe this can be written in a better fashion. just checks for when the axes meet
-				{
-					raw_y = window.getSize().y / 2;
-					pixel.setPosition(sf::Vector2f(x,raw_y));
-					window.draw(f_pixel);
-					continue;
-				}
-				else raw_y = a * pow(raw_x,n) +  b*pow(raw_x,n-1) + c; // raw_y is equivalent to f(x) (obviously)
-
-				// The formula is simple: 1 LU = 160 px, so we just multiply the raw value again. Additionally, if it's positive we draw it above the x-axis, if not below.
-				if (raw_y >= 0) f_pixel.setPosition(sf::Vector2f(x, ((window.getSize().y / 2) - 60) + 160 * abs(raw_y)));
-				else f_pixel.setPosition(sf::Vector2f(x,((window.getSize().y / 2) - 60) - 160 * abs(raw_y)));
 				window.draw(f_pixel);
 			}
 		}
